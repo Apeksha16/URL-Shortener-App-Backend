@@ -24,11 +24,9 @@ router.post("/shorten", async (req, res) => {
 
       // Check if it has a valid protocol
       if (!["http:", "https:"].includes(validUrl.protocol)) {
-        return res
-          .status(400)
-          .json({
-            error: "Invalid URL format. Only HTTP and HTTPS URLs are allowed",
-          });
+        return res.status(400).json({
+          error: "Invalid URL format. Only HTTP and HTTPS URLs are allowed",
+        });
       }
     } catch (error) {
       return res.status(400).json({ error: "Invalid URL format" });
@@ -72,7 +70,7 @@ router.post("/shorten", async (req, res) => {
 // GET /api/admin/urls - Get all URLs (admin only)
 router.get("/admin/urls", async (req, res) => {
   try {
-    const urls = await Url.find().sort({ createdAt: -1 });
+    const urls = await({ createdAt: -1 });
     res.json(urls);
   } catch (error) {
     console.error("Error fetching URLs:", error);

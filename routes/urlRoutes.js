@@ -70,7 +70,7 @@ router.post("/shorten", async (req, res) => {
 // GET /api/admin/urls - Get all URLs (admin only)
 router.get("/admin/urls", async (req, res) => {
   try {
-    const urls = await({ createdAt: -1 });
+    const urls = await Url.find().sort({ createdAt: -1 });
     res.json(urls);
   } catch (error) {
     console.error("Error fetching URLs:", error);

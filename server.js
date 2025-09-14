@@ -1,10 +1,10 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
 
-const Url = require('./models/Url');
-const urlRoutes = require('./routes/urlRoutes');
+const Url = require("./models/Url");
+const urlRoutes = require("./routes/urlRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,22 +15,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
-app.use('/api', urlRoutes);
+app.use("/api", urlRoutes);
 
 // GET /:shortcode - Redirect to original URL
-app.get('/:shortCode', async (req, res) => {
+app.get("/:shortCode", async (req, res) => {
   try {
     const { shortCode } = req.params;
-    
+
     const url = await Url.findOne({ shortCode });
-    
+
     if (!url) {
-      return res.status(404).json({ error: 'Short URL not found' });
+      return res.status(404).json({ error: "Short URL not found" });
     }
 
     // Increment click count
@@ -39,21 +40,20 @@ app.get('/:shortCode', async (req, res) => {
 
     // Redirect to original URL
     res.redirect(url.originalUrl);
-
   } catch (error) {
-    console.error('Error redirecting:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error redirecting:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'URL Shortener API is running' });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK", message: "URL Shortener API is running" });
 });
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+app.use("*", (req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
 
 app.listen(PORT, () => {

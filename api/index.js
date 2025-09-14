@@ -34,14 +34,27 @@ async function connectToDatabase() {
   }
 }
 
-// Routes
+// Ensure database connection for all routes
+app.use(async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'URL Shortener API is running' });
+});
+
+// API Routes
 app.use('/api', urlRoutes);
 
 // GET /:shortcode - Redirect to original URL
 app.get('/:shortCode', async (req, res) => {
   try {
-    await connectToDatabase();
-    
     const { shortCode } = req.params;
     
     const url = await Url.findOne({ shortCode });
@@ -63,14 +76,17 @@ app.get('/:shortCode', async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    await connectToDatabase();
-    res.json({ status: 'OK', message: 'URL Shortener API is running' });
-  } catch (error) {
-    res.status(500).json({ status: 'Error', message: 'Database connection failed' });
-  }
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'URL Shortener API', 
+    endpoints: {
+      health: '/api/health',
+      shorten: 'POST /api/shorten',
+      admin: '/api/admin/urls',
+      redirect: '/:shortCode'
+    }
+  });
 });
 
 // 404 handler
